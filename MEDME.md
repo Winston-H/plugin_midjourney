@@ -4,7 +4,7 @@
 
 ## 使用说明
 
-📌 在 [`Discord`](https://www.yuque.com/zsf9e3/amhz8b/mn5zkk7txztzeb0b)创建 Midjourney Bot，
+📌 在 [`Discord`](https://articles.zsxq.com/id_galu3lqwcog9.html)创建 Midjourney Bot，
 
 📌 构建完机器人后 [`获取Midjourney Bot API相关信息`](https://articles.zsxq.com/id_5isuec94bk6m.html) 
 
