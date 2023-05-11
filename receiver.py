@@ -21,7 +21,7 @@ class Receiver:
 
         with open(self.config_path, "r") as json_file:
             params = json.load(json_file)
-        self.url = params['url']
+        self.url = params['receiver_url']
         self.channelid = params['channelid']
         self.authorization = params['authorization']
         self.headers = {'authorization': self.authorization}
@@ -34,7 +34,6 @@ class Receiver:
     def collecting_results(self):
         message_list = self.retrieve_messages()
         self.awaiting_list = pd.DataFrame(columns=['prompt', 'status', 'url'])
-        print(f"[MJ] message_list is {message_list}")
         for message in message_list:
             if (message['author']['username'] == 'Midjourney Bot') and ('**' in message['content']):
                 if len(message['attachments']) > 0:
