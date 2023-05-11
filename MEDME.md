@@ -12,7 +12,10 @@
 
 
 
-将`config.json.template`复制为`config.json`，修改相关信息。
+将`config.json.template`复制为`config.json`，修改相关信息。具体信息参考 
+[`获取Midjourney Bot API相关信息`](https://articles.zsxq.com/id_5isuec94bk6m.html) 
+
+[`搭建反向代理`](https://wx.zsxq.com/dweb2/index/footprint/585252181521214)
 
 ```json
 {
