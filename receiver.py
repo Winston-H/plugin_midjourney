@@ -21,16 +21,18 @@ class Receiver:
 
         with open(self.config_path, "r") as json_file:
             params = json.load(json_file)
-        self.url = params['receiver_url']
+        self.url = params['base_url']
         self.channelid = params['channelid']
         self.authorization = params['authorization']
         self.headers = {'authorization': self.authorization}
+
     def retrieve_messages(self):
 
         r = requests.get(
             f'{self.url}api/v10/channels/{self.channelid}/messages?limit={1}', headers=self.headers)
         jsonn = json.loads(r.text)
         return jsonn
+
     def collecting_results(self):
         message_list = self.retrieve_messages()
         self.awaiting_list = pd.DataFrame(columns=['prompt', 'status', 'url'])
@@ -39,13 +41,12 @@ class Receiver:
                 if len(message['attachments']) > 0:
                     if (message['attachments'][0]['filename'][-4:] == '.png') or (
                             '(Open on website for full quality)' in message['content']):
-                        prompt = message['content'].split('**')[1].split(' --')[0]
+                        # prompt = message['content'].split('**')[1].split(' --')[0]
                         url = message['attachments'][0]['url']
                         return url
                     else:
                         print('drawing~')
                         return None
-
                 else:
                     print('Waiting to start~')
                     return None
@@ -56,4 +57,4 @@ class Receiver:
             if result:
                 print(f"URL found: {result}")
                 return result
-            time.sleep(1)
+            time.sleep(0.5)
