@@ -23,14 +23,16 @@ class Midjourney(Plugin):
         super().__init__()
         curdir = os.path.dirname(__file__)
         config_path = os.path.join(curdir, "config.json")
+        logger.info(f"Midj config_path is {config_path}")
         self.params_cache = ExpiredDict(60 * 60)
         if not os.path.exists(config_path):
-            logger.info('[MJ] 配置文件不存在，将使用config-template.json模板')
-            config_path = os.path.join(curdir, "../plugin_midjourney/config.json.template")
+            logger.info('[RP] 配置文件不存在，将使用config-template.json模板')
+            config_path = os.path.join(curdir, "../plugin_replicate/config.json.template")
         try:
             with open(config_path, "r", encoding="utf-8") as f:
                 config = json.load(f)
-                self.url = config["base_url"]
+                self.base_url = config["base_url"]
+                self.receiver_url = config["receiver_url"]
                 self.proxy = config.get("proxy", "")
                 self.channelid = config['channelid']
                 self.application_id = config['application_id']
@@ -43,12 +45,12 @@ class Midjourney(Plugin):
                 self.headers = {'authorization': self.authorization}
             self.handlers[Event.ON_HANDLE_CONTEXT] = self.on_handle_context
             self.client = self.butt_discord
-            logger.info("[MJ] inited")
+            logger.info("[RP] inited")
         except Exception as e:
             if isinstance(e, FileNotFoundError):
-                logger.warn(f"[MJ] init failed, config.json not found.")
+                logger.warn(f"[RP] init failed, config.json not found.")
             else:
-                logger.warn("[MJ] init failed." + str(e))
+                logger.warn("[RP] init failed." + str(e))
             raise e
 
     def butt_discord(self, prompt):
@@ -70,14 +72,14 @@ class Midjourney(Plugin):
                        'attachments': []}
                    }
         if self.proxy['http'] != "" or self.proxy['https'] != "":
-            r = requests.post(f"{self.url}api/v9/interactions", json=payload, headers=self.headers, proxies=self.proxy)
+            r = requests.post(f"{self.base_url}api/v9/interactions", json=payload, headers=self.headers, proxies=self.proxy)
             while r.status_code != 204:
-                r = requests.post(url=self.url, json=payload, headers=self.headers)
+                r = requests.post(url=self.base_url, json=payload, headers=self.headers)
         else:
-            r = requests.post(f"{self.url}api/v9/interactions", json=payload, headers=self.headers)
+            r = requests.post(f"{self.base_url}api/v9/interactions", json=payload, headers=self.headers)
             print(r.status_code)
             while r.status_code != 204:
-                r = requests.post(url=self.url, json=payload, headers=self.headers)
+                r = requests.post(url=self.base_url, json=payload, headers=self.headers)
         logger.info('prompt [{}] successfully sent!'.format(prompt))
         receiver = Receiver()
         result = receiver.main()
@@ -88,9 +90,9 @@ class Midjourney(Plugin):
         if e_context['context'].type not in [ContextType.IMAGE_CREATE, ContextType.IMAGE]:
             return
 
-        logger.debug("[MJ] on_handle_context. content: %s" % e_context['context'].content)
+        logger.debug("[RP] on_handle_context. content: %s" % e_context['context'].content)
 
-        logger.info("[MJ] image_query={}".format(e_context['context'].content))
+        logger.info("[RP] image_query={}".format(e_context['context'].content))
         reply = Reply()
         try:
             # user_id = e_context['context']["session_id"]
@@ -99,7 +101,7 @@ class Midjourney(Plugin):
             if e_context['context'].type == ContextType.IMAGE_CREATE:
                 print(f"[MJ] start image")
                 old_result = self.butt_discord(content)
-                result = old_result.replace("https://cdn.discordapp.com", "https://abc.aicore777.top:3389/mjdisplay/")
+                result = old_result.replace("https://cdn.discordapp.com", self.receiver_url)
                 reply.type = ReplyType.IMAGE_URL
                 reply.content = result
                 logger.info("[MJ] result={}".format(result))
