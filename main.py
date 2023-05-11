@@ -30,7 +30,7 @@ class Midjourney(Plugin):
         try:
             with open(config_path, "r", encoding="utf-8") as f:
                 config = json.load(f)
-                self.url = config["url"]
+                self.url = config["base_url"]
                 self.proxy = config.get("proxy", "")
                 self.channelid = config['channelid']
                 self.application_id = config['application_id']
