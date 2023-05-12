@@ -1,6 +1,6 @@
 {
-  "base_url": "",
-  "receiver_url": "",
+  "base_url": "代理discord发送指令请求地址",
+  "receiver_url": "代理discord接受图片链接的回调地址",
   "proxy": {
     "http": "",
     "https": ""
